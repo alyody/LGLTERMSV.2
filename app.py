@@ -68,13 +68,9 @@ with st.sidebar:
 # -------------------------------
 # Load terms from CSV
 # -------------------------------
-# Adjustments: strip spaces from headers, handle Excel-export quirks
 df = pd.read_csv("terms.csv")
-df.columns = df.columns.str.strip()   # remove leading/trailing spaces
+df.columns = df.columns.str.strip()   # normalize headers
 df = df.dropna(how="all")             # drop empty rows
-
-# Debug: show columns so you can confirm they match
-# st.write("Columns loaded:", df.columns.tolist())
 
 # -------------------------------
 # Chat Interface
@@ -99,4 +95,10 @@ if query:
         else:
             st.warning("Sorry, I couldn't find that term. Try another one!")
     else:
-        st.error("CSV file is missing the 'Term' column. Please check your
+        st.error("CSV file is missing the 'Term' column. Please check your headers.")
+
+# -------------------------------
+# Footer
+# -------------------------------
+st.markdown("---")
+st.caption("© 2025 Liberty Global Logistics (LGL) — Interactive Chatbot Demo")

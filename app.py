@@ -68,7 +68,13 @@ with st.sidebar:
 # -------------------------------
 # Load terms from CSV
 # -------------------------------
+# Adjustments: strip spaces from headers, handle Excel-export quirks
 df = pd.read_csv("terms.csv")
+df.columns = df.columns.str.strip()   # remove leading/trailing spaces
+df = df.dropna(how="all")             # drop empty rows
+
+# Debug: show columns so you can confirm they match
+# st.write("Columns loaded:", df.columns.tolist())
 
 # -------------------------------
 # Chat Interface
@@ -79,21 +85,18 @@ query = st.text_input("🔍 Enter a logistics term:")
 
 if query:
     term = query.strip().upper()
-    match = df[df["Term"].str.upper() == term]
-    if not match.empty:
-        row = match.iloc[0]
-        st.markdown(f"""
-            <div class="term-card">
-                <h3>📘 {row['Term']} — {row['Complete Form']}</h3>
-                <p><b>Category:</b> {row['Category']}</p>
-                <p><b>Definition:</b> {row['Definition']}</p>
-            </div>
-        """, unsafe_allow_html=True)
+    if "Term" in df.columns:
+        match = df[df["Term"].str.upper() == term]
+        if not match.empty:
+            row = match.iloc[0]
+            st.markdown(f"""
+                <div class="term-card">
+                    <h3>📘 {row['Term']} — {row['Complete Form']}</h3>
+                    <p><b>Category:</b> {row['Category']}</p>
+                    <p><b>Definition:</b> {row['Definition']}</p>
+                </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.warning("Sorry, I couldn't find that term. Try another one!")
     else:
-        st.warning("Sorry, I couldn't find that term. Try another one!")
-
-# -------------------------------
-# Footer
-# -------------------------------
-st.markdown("---")
-st.caption("© 2025 Liberty Global Logistics (LGL) — Interactive Chatbot Demo")
+        st.error("CSV file is missing the 'Term' column. Please check your
